@@ -2,10 +2,11 @@
 
 namespace IIIRxs\ValidationErrorNormalizerBundle\DependencyInjection;
 
+use IIIRxs\ValidationErrorNormalizerBundle\Serializer\ConstraintViolationListNormalizer;
+use IIIRxs\ValidationErrorNormalizerBundle\Serializer\FormValidationErrorNormalizer;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
-use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 
 class IIIRxsValidationErrorNormalizerExtension extends Extension
@@ -26,6 +27,16 @@ class IIIRxsValidationErrorNormalizerExtension extends Extension
         );
 
         $loader->load('services.xml');
+
+        $configuration = $this->getConfiguration($configs, $container);
+        $config = $this->processConfiguration($configuration, $configs);
+
+        $mode = $config['form_validation_error_mode'];
+        $intMode = (int) array_search($mode, Configuration::FORM_ERROR_MODES);
+        $definition = $container->findDefinition(FormValidationErrorNormalizer::class);
+        $definition->setArgument(0, $intMode);
+        $definition = $container->findDefinition(ConstraintViolationListNormalizer::class);
+        $definition->setArgument(0, $intMode);
     }
 
 }

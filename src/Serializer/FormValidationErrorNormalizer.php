@@ -27,7 +27,7 @@ class FormValidationErrorNormalizer implements NormalizerInterface
         $errors = [];
 
         foreach ($form->getErrors() as $error) {
-            $errors[$this->getErrorPath($error)][] = $error->getMessage();
+            $errors = array_merge_recursive($errors, $this->normalizeError($error));
         }
 
         foreach ($form->all() as $childForm) {
@@ -41,12 +41,12 @@ class FormValidationErrorNormalizer implements NormalizerInterface
         return $errors;
     }
 
-    protected function getErrorPath(FormError $formError)
+    protected function normalizeError(FormError $formError)
     {
         if ($formError->getCause() instanceof ConstraintViolation) {
-            return $this->getViolationPath($formError->getCause());
+            return $this->normalizeConstraintViolation($formError->getCause());
         }
-        return 'global';
+        return ['global' => $formError->getMessage()];
     }
 
     public function supportsNormalization($data, $format = null, array $context = [])

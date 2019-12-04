@@ -26,8 +26,7 @@ class ConstraintViolationListNormalizer implements NormalizerInterface
     {
         $errors = [];
         foreach ($constraintViolationList as $constraintViolation) {
-            $path = $this->getViolationPath($constraintViolation);
-            $errors[$path][] = $constraintViolation->getMessage();
+            $errors = array_merge_recursive($errors, $this->normalizeConstraintViolation($constraintViolation));
         }
         return $errors;
     }

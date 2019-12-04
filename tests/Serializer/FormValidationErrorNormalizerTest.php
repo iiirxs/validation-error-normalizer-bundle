@@ -12,6 +12,7 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\PropertyNormalizer;
 use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\Serializer\SerializerInterface;
+use Symfony\Component\Validator\Constraints\Email;
 use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\Positive;
 use Symfony\Component\Validator\Validation;
@@ -24,35 +25,23 @@ class FormValidationErrorNormalizerTest extends TypeTestCase
     {
         $form = $this->factory->create();
 
-        $validationErrorNormalizer = new FormValidationErrorNormalizer();
+        $validationErrorNormalizer = new FormValidationErrorNormalizer(1);
 
         $this->assertTrue($validationErrorNormalizer->supportsNormalization($form, 'form.validation.error'));
     }
 
-    public function testNormalize()
+    /**
+     * @dataProvider validationErrorProvider
+     */
+    public function testNormalize($mode, $expected)
     {
         $form = $this->getFormBuilder()
             ->add('testProperty0', TextType::class, [
                 'required' => true,
-                'constraints' => [ new Length(['max' => 5, 'maxMessage' => 'Input too long']) ]
-            ])
-            ->getForm()
-        ;
-
-        $formData = [ 'testProperty0' => '123456' ];
-        $form->submit($formData);
-        $validationErrorNormalizer = new FormValidationErrorNormalizer();
-
-        $expected = [ 'testProperty0' => ['Input too long'] ];
-        $this->assertEquals($expected, $validationErrorNormalizer->normalize($form));
-    }
-
-    public function testNormalizeWithEmbeddedForm()
-    {
-        $form = $this->getFormBuilder()
-            ->add('testProperty0', TextType::class, [
-                'required' => true,
-                'constraints' => [ new Length(['max' => 5, 'maxMessage' => 'Input too long']) ]
+                'constraints' => [
+                    new Length(['max' => 5, 'maxMessage' => 'Input too long']),
+                    new Email(['message' => 'Invalid email'])
+                ]
             ])
             ->add(
                 $this->getFormBuilder()->create('location', FormType::class)
@@ -83,18 +72,40 @@ class FormValidationErrorNormalizerTest extends TypeTestCase
             ]
         ];
         $form->submit($formData);
-        $validationErrorNormalizer = new FormValidationErrorNormalizer();
-
-        $expected = [
-            'testProperty0' => ['Input too long'],
-            'location' => [
-                'Input too short',
-                'Longitude should be positive',
-                'Latitude should be positive'
-            ]
-        ];
+        $validationErrorNormalizer = new FormValidationErrorNormalizer($mode);
 
         $this->assertEquals($expected, $validationErrorNormalizer->normalize($form));
+    }
+
+    public function validationErrorProvider()
+    {
+        return [
+            [
+                'mode' => 0,
+                'expected' => [
+                    'testProperty0' => ['Input too long', 'Invalid email'],
+                    'location' => [
+                        'Input too short',
+                        'Longitude should be positive',
+                        'Latitude should be positive'
+                    ]
+                ]
+            ],
+            [
+                'mode' => 1,
+                'expected' => [
+                    'testProperty0' => ['Input too long', 'Invalid email'],
+                    'location' => [
+                        "address" => "Input too short",
+                        "coordinates" => [
+                            "lat" => "Latitude should be positive",
+                            "lng" => "Longitude should be positive"
+                        ]
+                    ]
+                ]
+            ]
+
+        ];
     }
 
     protected function getFormBuilder()

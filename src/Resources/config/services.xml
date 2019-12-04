@@ -12,6 +12,7 @@
             class="IIIRxs\ValidationErrorNormalizerBundle\Serializer\FormValidationErrorNormalizer"
             public="true"
         >
+            <argument></argument>
             <tag name="serializer.normalizer" />
         </service>
 
@@ -26,6 +27,7 @@
             class="IIIRxs\ValidationErrorNormalizerBundle\Serializer\ConstraintViolationListNormalizer"
             public="true"
         >
+            <argument></argument>
             <tag name="serializer.normalizer" />
         </service>
 
