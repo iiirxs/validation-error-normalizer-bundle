@@ -8,6 +8,7 @@ use Symfony\Component\Validator\ConstraintViolationListInterface;
 
 class ConstraintViolationListNormalizer implements NormalizerInterface
 {
+    use ContraintViolationPathTrait;
 
     const FORMAT = 'constraint.violation.list';
 
@@ -29,12 +30,6 @@ class ConstraintViolationListNormalizer implements NormalizerInterface
             $errors[$path][] = $constraintViolation->getMessage();
         }
         return $errors;
-    }
-
-    private function getViolationPath(ConstraintViolation $constraintViolation) {
-        preg_match_all("/\[([^\]]*)\]/", $constraintViolation->getPropertyPath(), $fields);
-
-        return $fields[1][0] ?? $constraintViolation->getPropertyPath();
     }
 
     public function supportsNormalization($data, $format = null, array $context = [])

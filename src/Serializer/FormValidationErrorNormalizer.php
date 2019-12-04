@@ -11,6 +11,8 @@ use Symfony\Component\Validator\ConstraintViolation;
 class FormValidationErrorNormalizer implements NormalizerInterface
 {
 
+    use ContraintViolationPathTrait;
+
     const FORMAT = 'form.validation.error';
 
     /**
@@ -25,18 +27,26 @@ class FormValidationErrorNormalizer implements NormalizerInterface
         $errors = [];
 
         foreach ($form->getErrors() as $error) {
-            $errors[] = $error->getMessage();
+            $errors[$this->getErrorPath($error)][] = $error->getMessage();
         }
 
         foreach ($form->all() as $childForm) {
             if ($childForm instanceof FormInterface) {
                 if ($childErrors = $this->normalize($childForm)) {
-                    $errors[$childForm->getName()] = $childErrors;
+                    $errors = array_merge_recursive($errors, $childErrors);
                 }
             }
         }
 
         return $errors;
+    }
+
+    protected function getErrorPath(FormError $formError)
+    {
+        if ($formError->getCause() instanceof ConstraintViolation) {
+            return $this->getViolationPath($formError->getCause());
+        }
+        return 'global';
     }
 
     public function supportsNormalization($data, $format = null, array $context = [])
