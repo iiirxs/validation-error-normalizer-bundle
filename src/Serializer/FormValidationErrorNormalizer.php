@@ -2,11 +2,13 @@
 
 namespace IIIRxs\ValidationErrorNormalizerBundle\Serializer;
 
+use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Serializer\Exception\ExceptionInterface;
-use Symfony\Component\Serializer\Normalizer\PropertyNormalizer;
+use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
+use Symfony\Component\Validator\ConstraintViolation;
 
-class FormValidationErrorNormalizer extends PropertyNormalizer
+class FormValidationErrorNormalizer implements NormalizerInterface
 {
 
     const FORMAT = 'form.validation.error';
@@ -20,19 +22,26 @@ class FormValidationErrorNormalizer extends PropertyNormalizer
      */
     public function normalize($form, $format = null, array $context = []): array
     {
-        $normalizedErrors = parent::normalize($form->getErrors(true))['errors'];
+        $errors = [];
 
-        $mapMessage = function (array $error) { return $error['message']; };
-        $mapPropertyPath = function (array $error) { return $error['cause']['propertyPath'] ?? 'global'; };
+        foreach ($form->getErrors() as $error) {
+            $errors[] = $error->getMessage();
+        }
 
-        $errorMessages = array_map($mapMessage, $normalizedErrors);
-        $errorPaths = array_map($mapPropertyPath, $normalizedErrors);
+        foreach ($form->all() as $childForm) {
+            if ($childForm instanceof FormInterface) {
+                if ($childErrors = $this->normalize($childForm)) {
+                    $errors[$childForm->getName()] = $childErrors;
+                }
+            }
+        }
 
-        return array_combine($errorPaths, $errorMessages);
+        return $errors;
     }
 
     public function supportsNormalization($data, $format = null, array $context = [])
     {
         return $data instanceof FormInterface && $format === self::FORMAT;
     }
+
 }

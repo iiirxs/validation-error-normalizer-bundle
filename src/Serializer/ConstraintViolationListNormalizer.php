@@ -2,11 +2,11 @@
 
 namespace IIIRxs\ValidationErrorNormalizerBundle\Serializer;
 
-use Symfony\Component\Serializer\Normalizer\ContextAwareNormalizerInterface;
+use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Validator\ConstraintViolation;
 use Symfony\Component\Validator\ConstraintViolationListInterface;
 
-class ConstraintViolationListNormalizer implements ContextAwareNormalizerInterface
+class ConstraintViolationListNormalizer implements NormalizerInterface
 {
 
     const FORMAT = 'constraint.violation.list';

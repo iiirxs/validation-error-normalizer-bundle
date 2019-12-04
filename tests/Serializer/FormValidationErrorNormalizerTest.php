@@ -38,18 +38,10 @@ class FormValidationErrorNormalizerTest extends TypeTestCase
 
         $formData = [ 'testProperty0' => '123456' ];
         $form->submit($formData);
-        $validationErrorNormalizer = $this->getNormalizer();
-
-        $expected = [ 'children[testProperty0].data' => 'Input too long' ];
-        $this->assertEquals($expected, $validationErrorNormalizer->normalize($form));
-    }
-
-    protected function getNormalizer()
-    {
         $validationErrorNormalizer = new FormValidationErrorNormalizer();
-        $validationErrorNormalizer->setSerializer(new Serializer([new PropertyNormalizer()]));
 
-        return $validationErrorNormalizer;
+        $expected = [ 'testProperty0' => ['Input too long'] ];
+        $this->assertEquals($expected, $validationErrorNormalizer->normalize($form));
     }
 
     protected function getFormBuilder()
