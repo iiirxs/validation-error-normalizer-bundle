@@ -39,4 +39,9 @@ class IIIRxsValidationErrorNormalizerExtension extends Extension
         $definition->setArgument(0, $intMode);
     }
 
+    public function getAlias()
+    {
+        return 'iiirxs_validation_error_normalizer';
+    }
+
 }
