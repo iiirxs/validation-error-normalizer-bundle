@@ -3,12 +3,11 @@
 namespace IIIRxs\ValidationErrorNormalizerBundle\Serializer;
 
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
-use Symfony\Component\Validator\ConstraintViolation;
 use Symfony\Component\Validator\ConstraintViolationListInterface;
 
 class ConstraintViolationListNormalizer implements NormalizerInterface
 {
-    use ContraintViolationPathTrait;
+    use ContraintViolationNormalizerTrait;
 
     const FORMAT = 'constraint.violation.list';
 

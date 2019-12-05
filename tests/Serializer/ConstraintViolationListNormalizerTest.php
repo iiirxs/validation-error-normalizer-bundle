@@ -8,7 +8,6 @@ use IIIRxs\ValidationErrorNormalizerBundle\Serializer\ConstraintViolationListNor
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Validator\Constraints\Collection;
 use Symfony\Component\Validator\Constraints\Email;
-use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\ConstraintViolationList;
 use Symfony\Component\Validator\ValidatorBuilder;
@@ -41,6 +40,7 @@ class ConstraintViolationListNormalizerTest extends TestCase
         $expected = [ 'email' => 'Invalid e-mail' ];
 
         $normalizer = new ConstraintViolationListNormalizer($mode);
+
         $this->assertEquals($expected, $normalizer->normalize($errors));
 
     }

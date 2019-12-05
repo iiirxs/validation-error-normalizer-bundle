@@ -8,10 +8,6 @@ use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Forms;
 use Symfony\Component\Form\Test\TypeTestCase;
-use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
-use Symfony\Component\Serializer\Normalizer\PropertyNormalizer;
-use Symfony\Component\Serializer\Serializer;
-use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Validator\Constraints\Email;
 use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\Positive;
@@ -46,7 +42,7 @@ class FormValidationErrorNormalizerTest extends TypeTestCase
             ->add(
                 $this->getFormBuilder()->create('location', FormType::class)
                     ->add('address', TextType::class, [
-                        'constraints' => [ new Length(['min' => 10, 'minMessage' => 'Input too short']) ]
+                        'constraints' => [ new Length(['min' => 10, 'minMessage' => 'Input too short', 'allowEmptyString' => false]) ]
                     ])
                     ->add(
                         $this->getFormBuilder()->create('coordinates', FormType::class)

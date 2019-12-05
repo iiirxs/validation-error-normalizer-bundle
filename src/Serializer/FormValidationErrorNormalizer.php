@@ -11,7 +11,7 @@ use Symfony\Component\Validator\ConstraintViolation;
 class FormValidationErrorNormalizer implements NormalizerInterface
 {
 
-    use ContraintViolationPathTrait;
+    use ContraintViolationNormalizerTrait;
 
     const FORMAT = 'form.validation.error';
 
